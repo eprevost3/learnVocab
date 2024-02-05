@@ -1,0 +1,22 @@
+{
+    "Boudinet": [
+        ["small", "petit"],
+        ["tall", "grand"],
+        ["high", "haut"],
+        ["low", "bas"],
+        ["big", "large"]
+    ],
+    "Pupuce": [
+        ["green", "vert"],
+        ["blue", "bleu"],
+        ["green", "vert"],
+        ["yellow", "jaune"],
+        ["red", "rouge"]
+    ],
+    "Titou": [
+        ["to mug", "agresser"],
+        ["to dismay", "consterner"],
+        ["to stump", "poser une colle, laisser perplexe"],
+        ["to woo", "courtiser, séduire"]
+    ]
+  }

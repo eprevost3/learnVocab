@@ -1,0 +1,13 @@
+
+/* Set html and body to take up 100% of the viewport height */
+html, body {
+    height: 100%;
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+  }
+  
+  /* Set #root to take up 100% of the viewport height */
+  #root{
+    height: 100vh;
+    width: 100vw;
+  }
