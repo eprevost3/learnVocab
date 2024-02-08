@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { toggleRandom, changeDataset } from '../redux_logic/store'
 
 function Score(): ReactNode{
-    let score = useSelector(state => state.score.value)
+    let score = useSelector((state: {score: {value: number}}) => state.score.value)
     return(<h3>Score: {score}</h3>)
 }
 

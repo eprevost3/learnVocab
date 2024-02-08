@@ -23,4 +23,5 @@ function App() {
 export default App
 
 
-// remplacer le guess par une carte avec d'abord un bouton 
+// nettoyer le code 
+// ajouter le tips -> pour mieux deviner le mot

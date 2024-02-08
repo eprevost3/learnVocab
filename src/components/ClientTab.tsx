@@ -1,7 +1,7 @@
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import { ReactNode, useState } from 'react'
-import { changeUser } from '../redux_logic/store'
+import { ReactNode } from 'react'
+import { changeUser } from '../redux_logic/store.ts'
 import { useDispatch } from 'react-redux'
 import Guess from './Guess'
 
@@ -9,7 +9,7 @@ function ClientTab(): ReactNode {
     const dispatcher = useDispatch()
     
     // things to change when going to a different tab
-    const handleTabSelect = (selectedTab: string) => {
+    const handleTabSelect = (selectedTab: string | null) => {
         dispatcher(changeUser(selectedTab))
     }
     return (
