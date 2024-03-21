@@ -25,3 +25,5 @@ export default App
 
 // nettoyer le code 
 // ajouter le tips -> pour mieux deviner le mot
+// ajouter des mots 
+// gérer l'aide / l'alerte 
