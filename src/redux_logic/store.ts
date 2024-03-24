@@ -50,9 +50,4 @@ const store = configureStore({
   },
 })
 
-// store.subscribe(() => {
-//     console.log("current store", store.getState());
-// })
-
-
 export default store
