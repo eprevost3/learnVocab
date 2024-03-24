@@ -3,9 +3,9 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container'
 import Button from 'react-bootstrap/Button'
 import Alert from 'react-bootstrap/Alert';
-import Form from 'react-bootstrap/Form';
+import Fade from 'react-bootstrap/Fade'
 import { 
-    useState, useEffect, useRef, ReactNode, KeyboardEvent, ChangeEvent 
+    useState, useRef, ReactNode, KeyboardEvent, useEffect 
 } from 'react'
 import { useSelector, useDispatch, shallowEqual } from 'react-redux'
 import { incrementScore } from '../redux_logic/store.js'
@@ -20,7 +20,7 @@ interface DataType {
     }
 }
 
-const fetchData = () : DataType => {
+const fetchData = (): DataType => {
     // collect the json files containing all data
     const data:  DataType = {'ang-fra': angFra,'esp-fra': espFra,'fra-ang': fraAng,}
     console.log("data", data);
@@ -54,27 +54,22 @@ function getWord(
 }
 
 interface validateGuessProps{
-    'guess': string,
+    'guess': string[],
     'answer': string,
     'dispatcher': Function,
-    'updater': Function, // if the word is correctly guessed, reset the guess to ''
     'setShowAnswer': Function, // if the word is guess correctly, then we 
         // need to clear the help pop-up
 }
 
 function validateGuess (
-    { guess, answer, dispatcher, updater, setShowAnswer }: validateGuessProps
+    { guess, answer, dispatcher, setShowAnswer }: validateGuessProps
 ): void{
-    console.log("hello", setShowAnswer);
-    
     // check that the word the user entered corresponds to the answer
-    if (guess === answer){
+    if (guess.join('') === answer){
         // stop displaying the answer 
         setShowAnswer(false)
 
-        dispatcher(incrementScore())
-        updater('')
-
+        dispatcher(incrementScore())     
     }else{
         console.error("wrong")
         console.log("guess:", guess, "answer", answer)
@@ -98,44 +93,15 @@ function WordToGuess({wordAndDefinition}: WordToGuessProps){
     )
 }
 
-interface InputProps{
-    'onKeyDown': (evt: KeyboardEvent) => void,
-    'formValue': string,
-    'handleInputChange': (event: ChangeEvent<HTMLInputElement>) => void,
-}
-
-function Input({onKeyDown, formValue, handleInputChange}: InputProps): ReactNode{
-    // outputs the input bar where the user type his guess
-    return(
-        <Row className='mt-5'>
-        <Col/>
-        <Col>
-            <Form onKeyDown={onKeyDown}>
-                <Form.Group className="mb-3">
-                    <Form.Control
-                    placeholder="mot à deviner"
-                    value={formValue}
-                    onChange={handleInputChange}
-                />
-                </Form.Group>
-            </Form>
-        </Col>
-        <Col/>
-    </Row>
-    )
-}
-
-
 interface PropsButtonValidateGuess{
-    'formValue': string, 
+    'formValue': string[], 
     'wordAndDefinition': {[key: string]: string}, 
     'dispatcher': Function, 
-    'setFormValue': Function, 
     'setShowAnswer': Function,
 }
 
 function ButtonValidateGuess({
-    formValue, wordAndDefinition, dispatcher, setFormValue, setShowAnswer
+    formValue, wordAndDefinition, dispatcher, setShowAnswer
 }: PropsButtonValidateGuess): ReactNode {
     // button used to validate the guess of the user
     
@@ -147,7 +113,6 @@ function ButtonValidateGuess({
                 'guess': formValue,
                 'answer': wordAndDefinition.definition,
                 'dispatcher': dispatcher,
-                'updater': setFormValue,
                 'setShowAnswer': setShowAnswer,
             })}
         >
@@ -181,16 +146,15 @@ function ShowAnswer(
 
 
 interface PropsButtons{
-    'formValue': string, 
+    'formValue': string[], 
     'wordAndDefinition': {[key: string]: string}, 
-    'dispatcher': Function, 
-    'setFormValue': Function, 
+    'dispatcher': Function,
     'setShowAnswer': Function,
     'showAnswer': boolean, 
 }
 
 function Buttons({
-    formValue, wordAndDefinition, dispatcher, setFormValue, showAnswer, setShowAnswer, 
+    formValue, wordAndDefinition, dispatcher, showAnswer, setShowAnswer, 
 }: PropsButtons): ReactNode{
     return(
         <>
@@ -201,7 +165,6 @@ function Buttons({
                         formValue={formValue}
                         wordAndDefinition={wordAndDefinition}
                         dispatcher={dispatcher}
-                        setFormValue={setFormValue}
                         setShowAnswer={setShowAnswer}
                     />
 
@@ -234,58 +197,106 @@ function Buttons({
 
 interface PropsInputWithHint{
     'nbLetters': number,
+    'updateGuess': Function,
 }
 
 // TODO:
 // gérer les espaces, gérer le nombre de lettres (ca marche plus à 19)
-// récupérer la valeur du mot
-function InputWithHint({nbLetters}: PropsInputWithHint): ReactNode{
+// mettre plus de mots, gérer si tout marche, mettre des espaces
+function InputWithHint({nbLetters, updateGuess}: PropsInputWithHint): ReactNode{
     // several inputs aggregated together. Each input can only contain one letter
     // this makes it easier to guess the word
+
+    // stupid hack: creating all the inputs, and hidding the useless ones...
+    // this is the only way to work otherwise we get issues every time we refresh
+    const nbInputs = 18
+    
     const listRef: React.MutableRefObject<HTMLInputElement>[] = 
-        Array(nbLetters).fill(null).map((elt) => useRef(elt))
+        Array(nbInputs).fill(null).map((elt) => useRef(elt))
+
 
     // the cell where we should type the letter
     let activeCell = 0
+    let word = updateGuess('', activeCell)
 
     const handleFocus = () => {listRef[activeCell].current.focus()}
     const handleChange = (evt: KeyboardEvent) => {
         if((evt.key === "Backspace") || (evt.key === "Delete")){
-            // case where we a deletion
-            activeCell = Math.max(0, activeCell - 1)
-            // careful with the order of the focus
-            handleFocus()
+            // case where we a deletion and the cell was already filled with a
+            // value 
+            if (word[activeCell]){
+                // leave the cursor in the box
+                word = updateGuess('', activeCell)
+            }else{
+                // move to the previous box
+                activeCell = Math.max(0, activeCell - 1)
+
+                // careful with the order of the focus
+                handleFocus()
+            }
         }else if((evt.key === ' ') || (evt.key === 'Enter')){
-            // do nothing and erase what's in the cell
-            listRef[activeCell].current.value = ''   
+            // do nothing and erase what's in the cell 
         }else{
+            word = updateGuess(evt.key, activeCell)
+            // when we come back in cells already filled, we need to overwrite 
+            // the value. Seems it's not done by default
+            listRef[activeCell].current.value = evt.key
+
             // increment the counter and move to next cell
             activeCell = Math.min(activeCell + 1, nbLetters - 1)
             handleFocus()
         }   
+    }
+    const getClassName = (idx: number): string => {
+        const className = (
+            idx < nbLetters ? 'fw-bold text-center m-1': 'fw-bold text-center d-none'
+        )
+        return className
     }
 
     return(
         <div className='d-flex justify-content-center'>
             {listRef.map(
                 (r, idx) => <input 
-                    className='fw-bold text-center m-1'
+                    className={getClassName(idx)}
                     key={idx} 
                     size={1}
                     ref={r} 
                     maxLength={1}
                     onFocus={handleFocus}
                     onKeyUp={(evt) => handleChange(evt)}
+                    value=''
             />)
             }
         </div>
+    )
+}
+interface PropsMessage{
+    score: number,
+}
+function Message({score}: PropsMessage): ReactNode{
+    // display the message just for a certain amount of time
+    const [isVisible, setIsVisible] = useState(true)
+
+    useEffect(
+        () => {setIsVisible(true)},
+        [score]
+    )
+
+    setTimeout(() => setIsVisible(false), 1000)
+    
+    return(
+        <Col className='d-flex justify-content-center'>
+            <Fade in={isVisible}>
+                <Button  variant="success">Bonne réponse !!</Button>
+            </Fade>
+        </Col>
     )
 }
 
 function Guess(): ReactNode {
     // display the word to guess, with the associated definition, provides a place
     // to answer and to submit
-
     const dispatcher = useDispatch()
 
     // do we want the words to be displayed in a random order or sequentially?
@@ -295,6 +306,7 @@ function Guess(): ReactNode {
         score: {value: number},
         user: {value: string},
     }
+
     const currState: [boolean, string, number, string] = useSelector(
         (state: StateType) => {return([
                 state.random.value,
@@ -307,70 +319,39 @@ function Guess(): ReactNode {
     )
     const [ randomStatus, dataset, score, user ] = currState
 
-    // the word to display
-    let [wordAndDefinition, setWord] = useState(
-        {'toGuess': '', 'definition': ''}
-    )
-    // what is being typed in the input bar
-    let [formValue, setFormValue] = useState('')
-
     // do we show the answer card?
     let [showAnswer, setShowAnswer] = useState(false)
 
-    // get the word to guess and its definition
-    useEffect(() => {
-        const wordAndDef = getWord(user, randomStatus, dataset, score)
-        const word = {
-            'toGuess': wordAndDef[0], 
-            'definition': wordAndDef[1],
-        }
-        setWord(word)
-    // !! The dependency array ensures the effect runs only under certain conditions
-    // use this when there are some promises involved
-    }, currState)
-
-
-    const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => { 
-        setFormValue(event.target.value)
+    const wordAndDef = getWord(user, randomStatus, dataset, score)
+    const wordAndDefinition = {
+        'toGuess': wordAndDef[0], 
+        'definition': wordAndDef[1],
     }
 
-    console.log(randomStatus, dataset, score, user )
-
-    // use the enter key to submit the word
-    const onKeyDown =(evt: KeyboardEvent) => {
-        if(evt.key === "Enter"){
-            // avoid refreshing the page
-            evt.preventDefault()
-
-            validateGuess({
-                'guess': formValue,
-                'answer': wordAndDefinition.definition,
-                'dispatcher': dispatcher,
-                'updater': setFormValue,
-                'setShowAnswer': setShowAnswer,
-            })}
-        else{}
+    let guess = Array(wordAndDefinition.definition.length).fill('')
+    const updateGuess = (letter: string, idx: number): string[] => {
+        // contains the current guess of the user
+        guess[idx] = letter
+        return(guess)
     }
 
     return(
         <Container fluid>
             <Row className='mt-5 '/>
-            
+
+            <Message score={score}/>
+
             <WordToGuess wordAndDefinition={wordAndDefinition}/>
 
-            <Input 
-                onKeyDown={onKeyDown}
-                formValue={formValue}
-                handleInputChange={handleInputChange}
+            <InputWithHint 
+                nbLetters={guess.length}
+                updateGuess={updateGuess}
             />
 
-            <InputWithHint nbLetters={18}/>
-
             <Buttons 
-                formValue={formValue}
+                formValue={guess}
                 wordAndDefinition={wordAndDefinition}
                 dispatcher={dispatcher}
-                setFormValue={setFormValue}
                 showAnswer={showAnswer}
                 setShowAnswer={setShowAnswer}
             />
