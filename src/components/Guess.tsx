@@ -12,6 +12,7 @@ import { incrementScore } from '../redux_logic/store.js'
 import angFra from '../data/ang-fra.json'
 import espFra from '../data/esp-fra.json'
 import fraAng from '../data/fra-ang.json'
+import fraEsp from '../data/fra-esp.json'
 
 
 interface DataType {
@@ -22,8 +23,9 @@ interface DataType {
 
 const fetchData = (): DataType => {
     // collect the json files containing all data
-    const data:  DataType = {'ang-fra': angFra,'esp-fra': espFra,'fra-ang': fraAng,}
-    console.log("data", data);
+    const data:  DataType = {
+        'ang-fra': angFra,'esp-fra': espFra,'fra-ang': fraAng, 'fra-esp': fraEsp
+    }
 
     return data
 };
@@ -72,7 +74,6 @@ function validateGuess (
         dispatcher(incrementScore())     
     }else{
         console.error("wrong")
-        console.log("guess:", guess, "answer", answer)
     }
 }
 
@@ -149,13 +150,14 @@ interface PropsButtons{
     'formValue': string[], 
     'wordAndDefinition': {[key: string]: string}, 
     'dispatcher': Function,
-    'setShowAnswer': Function,
-    'showAnswer': boolean, 
+    // 'setShowAnswer': Function,
+    // 'showAnswer': boolean, 
 }
 
-function Buttons({
-    formValue, wordAndDefinition, dispatcher, showAnswer, setShowAnswer, 
-}: PropsButtons): ReactNode{
+function Buttons(
+    {formValue, wordAndDefinition, dispatcher}: PropsButtons): ReactNode{
+    // do we show the answer card?
+    let [showAnswer, setShowAnswer] = useState(false)
     return(
         <>
             <Row className='mt-5'>
@@ -196,20 +198,18 @@ function Buttons({
 }
 
 interface PropsInputWithHint{
-    'nbLetters': number,
+    'guess': string,
     'updateGuess': Function,
 }
 
-// TODO:
-// gérer les espaces, gérer le nombre de lettres (ca marche plus à 19)
-// mettre plus de mots, gérer si tout marche, mettre des espaces
-function InputWithHint({nbLetters, updateGuess}: PropsInputWithHint): ReactNode{
+function InputWithHint({guess, updateGuess}: PropsInputWithHint): ReactNode{
     // several inputs aggregated together. Each input can only contain one letter
     // this makes it easier to guess the word
 
     // stupid hack: creating all the inputs, and hidding the useless ones...
     // this is the only way to work otherwise we get issues every time we refresh
-    const nbInputs = 18
+    const nbInputs = 50
+    const nbLetters = guess.length
     
     const listRef: React.MutableRefObject<HTMLInputElement>[] = 
         Array(nbInputs).fill(null).map((elt) => useRef(elt))
@@ -234,7 +234,7 @@ function InputWithHint({nbLetters, updateGuess}: PropsInputWithHint): ReactNode{
                 // careful with the order of the focus
                 handleFocus()
             }
-        }else if((evt.key === ' ') || (evt.key === 'Enter')){
+        }else if(evt.key === 'Enter'){
             // do nothing and erase what's in the cell 
         }else{
             word = updateGuess(evt.key, activeCell)
@@ -276,10 +276,10 @@ interface PropsMessage{
 }
 function Message({score}: PropsMessage): ReactNode{
     // display the message just for a certain amount of time
-    const [isVisible, setIsVisible] = useState(true)
+    const [isVisible, setIsVisible] = useState(false)
 
     useEffect(
-        () => {setIsVisible(true)},
+        () => {if(score > 0){setIsVisible(true)}},
         [score]
     )
 
@@ -318,9 +318,7 @@ function Guess(): ReactNode {
         shallowEqual  // Use shallowEqual to perform equality check
     )
     const [ randomStatus, dataset, score, user ] = currState
-
-    // do we show the answer card?
-    let [showAnswer, setShowAnswer] = useState(false)
+    
 
     const wordAndDef = getWord(user, randomStatus, dataset, score)
     const wordAndDefinition = {
@@ -344,7 +342,7 @@ function Guess(): ReactNode {
             <WordToGuess wordAndDefinition={wordAndDefinition}/>
 
             <InputWithHint 
-                nbLetters={guess.length}
+                guess={wordAndDef[1]}
                 updateGuess={updateGuess}
             />
 
@@ -352,8 +350,6 @@ function Guess(): ReactNode {
                 formValue={guess}
                 wordAndDefinition={wordAndDefinition}
                 dispatcher={dispatcher}
-                showAnswer={showAnswer}
-                setShowAnswer={setShowAnswer}
             />
         </Container>
     )
