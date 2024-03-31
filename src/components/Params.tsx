@@ -35,6 +35,7 @@ function Data(): ReactNode {
                 <option value="fra-ang">{"Francais -> Anglais"}</option>
                 <option value="ang-fra">{"Anglais -> Francais"}</option>
                 <option value="esp-fra">{'Espagnol -> Francais'}</option>
+                <option value="fra-esp">{'Francais -> Espagnol'}</option>
             </Form.Select>
       </>
     );
