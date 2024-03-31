@@ -22,7 +22,7 @@ export const { toggleRandom } = randomReducer.actions
 
 const datasetReducer = createSlice({
     name: 'dataset',
-    initialState: {value: 'ang-fra'},
+    initialState: {value: 'fra-ang'},
     reducers: {
         changeDataset: (state, action) => {state.value = action.payload}
     }
