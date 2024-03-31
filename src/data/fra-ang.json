@@ -7,16 +7,20 @@
         ["small", "petit"]
     ],
     "Pupuce":[
-        ["red", "rouge"],
-        ["blue", "bleu"], 
-        ["green", "vert"], 
-        ["yellow", "jaune"], 
-        ["green", "vert"]
+        ["rouge", "red"],
+        ["bleu", "blue"], 
+        ["vert", "green"], 
+        ["jaune", "yellow"]
     ],
     "Titou":[
-        ["courtiser, séduire", "to woo"],
+        ["courtiser/séduire", "to woo"],
         ["consterner", "to dismay"],
-        ["poser une colle, laisser perplexe", "to stump"],
-        ["agresser", "to mug"]
+        ["poser une colle/laisser perplexe", "to stump"],
+        ["agresser", "to mug"], 
+        ["après une mauvaise blague, un vent", "I'll see myself out"],
+        ["encombrement/désordre", "clutter"],
+        ["exercice/entrainement", "a drill"],
+        ["super excité/joyeux/défoncé", "to be gassed"],
+        ["désinfectant", "disinfectant"]
     ]
 }

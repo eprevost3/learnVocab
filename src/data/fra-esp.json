@@ -1,0 +1,20 @@
+{
+    "Boudinet":[
+        ["salut", "hola"]
+    ],
+    "Pupuce":[
+        ["salut", "hola"]
+    ],
+    "Titou":[
+        ["demander (ordre)", "pedir"],
+        ["suivre", "seguir"],
+        ["s'habiller", "vestirse"],
+        ["tomber", "caer"],
+        ["mettre, poser", "poner"],
+        ["sortir", "salir"],
+        ["apporter", "traer"],
+        ["entendre", "oír"],
+        ["prendre, saisir", "coger"],
+        ["échange", "intercambio"]
+    ]
+}
