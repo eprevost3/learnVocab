@@ -15,6 +15,26 @@
         ["apporter", "traer"],
         ["entendre", "oír"],
         ["prendre, saisir", "coger"],
-        ["échange", "intercambio"]
+        ["échange", "intercambio"],
+        ["un échec", "un fracaso"],
+        ["se mettre en colère", "enfadarse"],
+        ["un hiver", "un invierno"],
+        ["le printemps", "la primavera"],
+        ["l'été", "el verano"],
+        ["l'automne", "el otoño"],
+        ["la campagne", "el campo"],
+        ["avoir l'habitude de", "soler"],
+        ["trop", "demasiado"],
+        ["arriver", "llegar"],
+        ["aussi", "también"],
+        ["toujours", "aún"],
+        ["toujours", "todavía"],
+        ["garder/prendre soin de", "cuidar"],
+        ["revenir/devenir/tourner", "volver"],
+        ["réaliser/obtenir", "lograr"],
+        ["un défi", "un reto"],
+        ["laisser/quitter", "dejar"],
+        ["demander/solliciter", "solicitar"],
+        ["tôt", "temprano"]
     ]
 }
